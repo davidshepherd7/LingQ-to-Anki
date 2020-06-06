@@ -39,17 +39,11 @@ def anki_connect_model_fields(model_name: str) -> List[str]:
     return anki_request("modelFieldNames", {"modelName": model_name})
 
 
-def anki_connect_add_note(deck: str, model: str, fields: Dict[str, str]):
+def anki_connect_add_notes(note_data: List[Dict[str, str]]):
     return anki_request(
-        "addNote",
+        "addNotes",
         {
-            "note": {
-                "deckName": deck,
-                "modelName": model,
-                "fields": fields,
-                "options": {"allowDuplicate": False},
-                "tags": ["lingq"],
-            }
+            "notes": note_data
         },
     )
 
@@ -144,16 +138,33 @@ def main(argv):
         token = lingq_login(args.username, args.password)
         cards = lingq_list_cards(token, args.language)
 
-        for card in cards:
-            term = card["term"]
-            translation = card["hints"][0]["text"]
-            print("Adding card", term, "->", translation)
-            if not args.dry_run:
-                note_id = anki_connect_add_note(
-                    args.deck, args.model, {"Front": term, "Back": translation}
-                )
+        notes_to_create = [
+            {"deckName": args.deck,
+            "modelName": args.model,
+            "fields": {
+                "Front": card["term"],
+                "Back": card["hints"][0]["text"],
+            },
+             "tags": "lingq",
+            }
+            for card in cards
+        ]
+
+
+        if args.dry_run:
+            for card in notes_to_create:
+                print("Would try to add card", card["fields"]["Front"], "->", card["fields"]["Back"])
+        else:
+            note_ids = anki_connect_add_notes(notes_to_create)
+            for i, note_id in enumerate(note_ids):
+                card = notes_to_create[i]
                 if note_id is None:
-                    print("Card was a duplicate, skipped")
+                    print("Card was a duplicate:", card["fields"]["Front"])
+                else:
+                    print("Added card:", card["fields"]["Front"], "->", card["fields"]["Back"])
+
+            valid_ids = [n for n in note_ids if n is not None]
+            print(f"{len(valid_ids)} new cards added")
     else:
         print(f"No such command: {args.command}")
         return 1
