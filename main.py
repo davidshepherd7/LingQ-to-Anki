@@ -27,11 +27,11 @@ def anki_connect_version() -> int:
     return int(anki_request("version"))
 
 
-def anki_connect_list_decks():
+def anki_connect_list_decks() -> Any:
     return anki_request("deckNames")
 
 
-def anki_connect_list_models():
+def anki_connect_list_models() -> Any:
     return anki_request("modelNames")
 
 
@@ -39,7 +39,7 @@ def anki_connect_model_fields(model_name: str) -> List[str]:
     return anki_request("modelFieldNames", {"modelName": model_name})
 
 
-def anki_connect_add_notes(note_data: List[Dict[str, str]]):
+def anki_connect_add_notes(note_data: List[Dict[str, str]]) -> Any:
     return anki_request(
         "addNotes",
         {
@@ -48,7 +48,7 @@ def anki_connect_add_notes(note_data: List[Dict[str, str]]):
     )
 
 
-def lingq_login(username, password):
+def lingq_login(username: str, password: str) -> str:
     auth = requests.post(
         "https://www.lingq.com/api/api-token-auth/",
         data={"username": username, "password": password},
@@ -57,7 +57,7 @@ def lingq_login(username, password):
     return auth.json()["token"]
 
 
-def lingq_list_languages(token) -> List[str]:
+def lingq_list_languages(token: str) -> List[str]:
     r = requests.get(
         "https://www.lingq.com/api/languages",
         headers={"Authorization": "Token {}".format(token)},
@@ -66,7 +66,7 @@ def lingq_list_languages(token) -> List[str]:
     return [l["code"] for l in r.json()]
 
 
-def lingq_list_cards(token: str, language_code: str):
+def lingq_list_cards(token: str, language_code: str) -> List[Any]:
     r = requests.get(
         f"https://www.lingq.com/api/v2/{language_code}/cards",
         params={"sort": "date"},
@@ -81,7 +81,8 @@ def lingq_list_cards(token: str, language_code: str):
     return results
 
 
-def parse_arguments(argv):
+
+def parse_arguments(argv: List[str]) -> Any:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command")
 
@@ -108,7 +109,7 @@ def parse_arguments(argv):
     return args
 
 
-def main(argv):
+def main(argv: List[str]) -> int:
     args = parse_arguments(argv)
 
     if args.command == "decks":
