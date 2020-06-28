@@ -150,6 +150,8 @@ def main(argv: List[str]) -> int:
              "tags": "lingq",
             }
             for card in cards
+            # TODO: warn about cards with no translations
+            if len(card["hints"]) > 0
         ]
 
 
