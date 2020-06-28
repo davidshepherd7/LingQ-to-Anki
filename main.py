@@ -7,6 +7,41 @@ from typing import List, Optional, Dict, Any
 import requests
 
 
+# Sample response:
+#
+# {
+#     "pk": 185034977,
+#     "url": "https://www.lingq.com/api/v2/fr/cards/185034977/",
+#     "term": "d\u00e8s que",
+#     "fragment": "\u2026le hall d'entr\u00e9e, puis, d\u00e8s que Dudley et la tante\u2026",
+#     "importance": 0,
+#     "status": 0,
+#     "extended_status": null,
+#     "last_reviewed_correct": null,
+#     "srs_due_date": "2020-06-29T09:12:46.769418",
+#     "notes": "",
+#     "audio": null,
+#     "altScript": [],
+#     "transliteration": [],
+#     "words": [
+#         "d\u00e8s",
+#         "que"
+#     ],
+#     "tags": [],
+#     "hints": [
+#         {
+#             "id": 83696,
+#             "locale": "en",
+#             "text": "as soon as",
+#             "term": "d\u00e8s que",
+#             "popularity": 592,
+#             "is_google_translate": false,
+#             "flagged": false
+#         }
+#     ]
+# }
+
+
 def anki_request(action: str, params: Optional[Dict[str, Any]] = None) -> Any:
     r = requests.get(
         "http://localhost:8765",
