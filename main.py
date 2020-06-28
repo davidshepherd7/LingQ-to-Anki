@@ -66,10 +66,10 @@ def lingq_list_languages(token: str) -> List[str]:
     return [l["code"] for l in r.json()]
 
 
-def lingq_list_cards(token: str, language_code: str) -> List[Any]:
+def list_unlearned_cards(token: str, language_code: str) -> List[Any]:
     r = requests.get(
         f"https://www.lingq.com/api/v2/{language_code}/cards",
-        params={"sort": "date"},
+        params={"sort": "date", "status": "0"},
         headers={"Authorization": "Token {}".format(token)},
     )
     r.raise_for_status()
@@ -137,7 +137,8 @@ def main(argv: List[str]) -> int:
         )
 
         token = lingq_login(args.username, args.password)
-        cards = lingq_list_cards(token, args.language)
+        # NOTE: This only imports new(ish) cards (status 1)
+        cards = list_unlearned_cards(token, args.language)
 
         notes_to_create = [
             {"deckName": args.deck,
