@@ -115,11 +115,11 @@ def list_unlearned_cards(token: str, language_code: str) -> List[Any]:
     assert len(results) == x["count"]
     return results
 
-def mark_linqg_known(token: str, language_code: str, id: str) -> None:
-    r = requests.put(
-        f"http://www.lingq.com/api/languages/{language_code}/lingqs/{id}/",
-        json={"status": 3},
+def mark_linqgs_known(token: str, language_code: str, ids: List[int]) -> None:
+    r = requests.post(
+        f"https://www.lingq.com/api/v2/{language_code}/cards/change_status/",
         headers={"Authorization": "Token {}".format(token)},
+        json={"cards": ids, "status":"known"}
     )
     r.raise_for_status()
 
@@ -146,7 +146,7 @@ def parse_arguments(argv: List[str]) -> Any:
     import_parser.add_argument("--deck", help="")
     import_parser.add_argument("--model", help="")
     import_parser.add_argument("--dry-run", action="store_true", default=False)
-    import_parser.add_argument("--mark-known", action="store_true", default=False, help="Mark the lingQ as 'known' on LingQ, meaning that it won't be re-imported when you next run this script. This may be slow if importing a very large number of lingQs.")
+    import_parser.add_argument("--mark-known", action="store_true", default=False, help="Mark the lingQ as 'known' on LingQ, meaning that it won't be re-imported when you next run this script.")
 
     args = parser.parse_args(argv)
     return args
@@ -214,13 +214,12 @@ def main(argv: List[str]) -> int:
 
 
         if args.mark_known:
+            if not args.dry_run:
+                mark_linqgs_known(token, args.language, [lingq["pk"] for lingq in cards])
+
             for lingq in cards:
                 lingq_name = lingq['term']
-                if args.dry_run:
-                    print(f"Would mark lingq {lingq_name} as known")
-                else:
-                    mark_linqg_known(token, args.language, lingq["pk"])
-                    print(f"Marked lingq {lingq_name} as known")
+                print(f"Marked lingq {lingq_name} as known")
 
     else:
         print(f"No such command: {args.command}")
