@@ -12,3 +12,8 @@ Make sure Anki is running in the background and the AnkiConnect plugin is added
 pip install poetry
 poetry run ./main.py -h
 ```
+
+# History
+
+Losely based on [squivix's package](https://github.com/squivix/LingQ-to-Anki), but I think I 
+ended up rewriting basically every line of code.
